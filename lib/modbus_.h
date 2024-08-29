@@ -57,7 +57,7 @@ protected: //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     virtual void config();
     virtual void selfPipeTrick(int &fdmax, fd_set &refset);
     virtual void start_connection(sockaddr_in &/*clientaddr*/, int /*socket*/){ }
-    virtual void reply(unsigned /*req_length*/){ }
+    void reply(unsigned req_length);
     virtual void end_connection(int /*socket*/){ }
     virtual void close();
     //.........................................................................

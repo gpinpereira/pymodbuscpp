@@ -19,9 +19,12 @@ int main(){
 
     server->connect_TCP(sc_address, 502, 2);
     std::cout << "bender" << std::endl;
+    
     server->execute();
 
+    server->wait();
     std::cout << "fiished" << std::endl;
 
+    //server->stop();
     return 0;
 }

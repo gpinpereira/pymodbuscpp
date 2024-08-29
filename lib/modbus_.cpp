@@ -49,6 +49,7 @@ struct timeval tv={0,0};
      FD_SET(newfd,&refset); // Add new descriptor to set.
      if (newfd>fdmax) fdmax=newfd; // keep track of maximum.
      start_connection(clientaddr,newfd); // accepted
+     std::cout << "New connection with " << std::endl;
     } else start_connection(clientaddr,-1); // rejected.
    } else { //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     modbus_set_socket(FContext, master_socket);
@@ -68,12 +69,26 @@ void cMODBUSServer::config(){
   modbus_set_debug(context(),FALSE);
   if (modbus_set_slave(context(),0)==-1) throw CEXCP::Exception
     ("Fail to set slave ID",CEXCP::cTypeID(THIS,__FUNCTION__),"modbus_set_slave");
-  mb_mapping = modbus_mapping_new(0,0,FStatus.size(),0);
+  //mb_mapping = modbus_mapping_new(5,0,0,0);
+  mb_mapping = modbus_mapping_new_start_address(0, 0, 0, 0, 340, 2, 0, 0);
+
+  mb_mapping = modbus_mapping_new_start_address(0, 0, 0, 0, 240, 2, 0, 0);
   if (mb_mapping==NULL) throw CEXCP::Exception("Failed to allocate the mapping",
     CEXCP::cTypeID(THIS,__FUNCTION__),"modbus_mapping_new");
-  for (unsigned r=0; r<FStatus.size(); ++r) // set
-    mb_mapping->tab_registers[r]=FStatus[r]=stOK;
+  //for (unsigned r=0; r<5; ++r) // set
+    mb_mapping->tab_registers[0]=42;
+    //mb_mapping->tab_registers[1]=22;
+    //mb_mapping->tab_registers[r]=false;
+
+
+  std::cout << "FStatus: " << FStatus.size() << std::endl;
 }
+void cMODBUSServer::reply(unsigned req_length){
+ lock(); //####################################################################
+ modbus_reply(context(),query(),req_length,mb_mapping);
+ unlock(); //##################################################################
+}
+
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 //! Implements the self-pipe trick to be able to safely exit 'select'
@@ -109,31 +124,30 @@ void cMODBUSServer::close(){
 /*===========================================================================*/
 cMODBUSServer::cMODBUSServer(unsigned timeout_):FSocket(ssUndefined),
 FContext(nullptr),FBackEnd(mbUndefined),FRTUServerID(-1),FHeaderLength(0),
-FTimeOut(timeout_),FQuery(nullptr),FStopped(true){ }
+FTimeOut(timeout_),FQuery(nullptr),FStopped(true){
+
+  Exception::debug=&std::cout;
+ }
 
 /*===========================================================================*/
 //! Create a context for TCP/IPv4; create and listen a TCP Modbus socket.
 void cMODBUSServer::connect_TCP(std::string ip, int port, int nConnect){
- try { close(); // reset and create new context ...............................
-  if (!(FContext=modbus_new_tcp(NULL,port))) throw Exception
+ try { 
+  
+  close(); // reset and create new context ...............................
+  if (!(FContext=modbus_new_tcp(ip.c_str(),port))) throw Exception
    ("Fail to create context",cTypeID(THIS,__FUNCTION__),"modbus_new_tcp");
-
-   std::cout << "picard " << (FContext==NULL) << std::endl;
-
   if (!(FQuery=static_cast<uint8_t*>(malloc(MODBUS_TCP_MAX_ADU_LENGTH)))) throw
    Exception("Fail to allocate memory",cTypeID(THIS,__FUNCTION__),"malloc");
+
   FHeaderLength=modbus_get_header_length(FContext);
 
-  std::cout << "farns" << std::endl;
   //...........................................................................
   config(); // user configuration, registers definition, etc
 
-  std::cout << "configed" << std::endl;
-
   if ((FSocket=modbus_tcp_listen(FContext,FnConnections=nConnect))==ssError) throw
-   Exception("Fail to get socket",cTypeID(THIS,__FUNCTION__),"modbus_tcp_pi_listen");
-
-   std::cout << "nibler " << FSocket << std::endl;
+   Exception(modbus_strerror(errno),cTypeID(THIS,__FUNCTION__),"modbus_tcp_pi_listen");
+  
  } catch (...){ close(); throw; }
 }
 
