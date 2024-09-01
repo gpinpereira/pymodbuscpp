@@ -33,9 +33,17 @@ struct timeval tv={0,0};
  FD_ZERO(&refset); FD_SET(FSocket,&refset);
  fdmax=FSocket; // Keep track of the max file descriptor
  selfPipeTrick(fdmax,refset); // add a self-pipe to safely '::disconnet'
+
+
+ std::cout << "running " << std::endl;
+
  //............................................................................
  for (; !FStopped; ){ // Searching for existing connections +++++++++++++++++++
   tv={FTimeOut,0}; // is modified in select (returns remaining time).
+
+  std::cout << "running3 " << std::endl;
+
+
   if (select(fdmax+1,&(rdset=refset),nullptr,nullptr,&tv)==-1) continue; // skip
   if (FD_ISSET(FSelfPipe[0], &rdset)) break; // see '::disconnet'
   // Run through existing connections looking for data to be read/new connections

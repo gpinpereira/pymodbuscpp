@@ -4,8 +4,10 @@ CXX = g++
 # Compiler flags
 CXXFLAGS = -std=c++11 -Wall
 
+PYINCLUDES = $(shell python3 -m pybind11 --includes)
+
 # Directories
-INCLUDES = -I/usr/include/modbus/ -I./lib/
+INCLUDES = -I/usr/local/include/modbus -I./lib/ -I$(shell python3 -m pybind11 --includes) 
 
 SRC_DIR = .
 SRC_FILES = main.cpp \
@@ -25,18 +27,19 @@ OBJ_FILES = $(SRC_FILES:.cpp=.o)
 TARGET = program
 
 # Libraries
-LIBS = -lpthread -lmodbus
+LIBS = -lpthread -lmodbus -lpython3.10
+
 
 # Build target
 all: $(TARGET)
 
 # Link the object files to create the executable
 $(TARGET): $(OBJ_FILES)
-	$(CXX) $(CXXFLAGS) $(OBJ_FILES) -o $(TARGET) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(OBJ_FILES) -o $(TARGET) $(LIBS) 
 
 # Compile each source file into an object file
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(PYINCLUDES) -c $< -o $@
 
 # Clean up generated files
 clean:

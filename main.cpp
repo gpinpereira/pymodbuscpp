@@ -1,4 +1,11 @@
 #include "modbus_.h"
+
+#include <pybind11/pybind11.h>
+#include <pybind11/embed.h>  // python interpreter
+#include <pybind11/stl.h>  // type conversion
+
+namespace py = pybind11;
+
 #include <iostream>
 //using namespace std;
 using namespace CUTIL;
@@ -7,6 +14,21 @@ using namespace CUTIL;
 int main(){
 
     std::cout << "Running new" << std::endl;
+
+    py::scoped_interpreter guard{}; // start interpreter, dies when out of scope
+
+    py::module Behaviours = py::module::import("Behaviours");
+
+    // Access the Python class
+    py::object Bsetpoint = Behaviours.attr("Bsetpoint");
+
+    // Create an instance of the Python class
+    py::object bset = Bsetpoint(10, 2);
+    bset.attr("setValue")(5);  // Increment the value
+    float value = bset.attr("getValue")().cast<float>();
+
+    std::cout << "The value is: " << value << "\n";
+
 
 
     CUTIL::cMODBUSServer *server;
