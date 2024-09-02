@@ -7,7 +7,7 @@ CXXFLAGS = -std=c++11 -Wall
 PYINCLUDES = $(shell python3 -m pybind11 --includes)
 
 # Directories
-INCLUDES = -I/usr/local/include/modbus -I./lib/ -I$(shell python3 -m pybind11 --includes) 
+INCLUDES = -I/usr/include/modbus/ -I/usr/local/include/modbus -I./lib/ -I./project/ -I$(shell python3 -m pybind11 --includes) 
 
 SRC_DIR = .
 SRC_FILES = main.cpp \
@@ -21,13 +21,14 @@ SRC_FILES = main.cpp \
 			lib/string_.cpp \
 			lib/mutex_.cpp \
 			lib/thread_.cpp \
-			lib/modbus_.cpp
+			lib/modbus_.cpp \
+			project/channel.cpp \
 
 OBJ_FILES = $(SRC_FILES:.cpp=.o)
 TARGET = program
 
 # Libraries
-LIBS = -lpthread -lmodbus -lpython3.10
+LIBS = -lpthread -lmodbus -lpython3.8
 
 
 # Build target
