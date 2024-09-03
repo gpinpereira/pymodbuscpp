@@ -1,3 +1,6 @@
+import random
+
+
 class Behavior:
 
     def __init__(self, params, channel):
@@ -17,7 +20,11 @@ class Bsetpoint(Behavior):
     def __init__(self, params, channel):
         super().__init__(params, channel)
 
+        print("Bsetpoint: ", params, channel)
+
+
     def getValue(self):
+        self.value = random.randint(0,50)
         return self.value
 
     def setValue(self, value):

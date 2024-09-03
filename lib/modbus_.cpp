@@ -22,6 +22,11 @@ void cMODBUSServer::OnStart(){
  FStopped=false; FSelfPipe[0]=FSelfPipe[1]=ssUndefined;
 }
 
+void cMODBUSServer::OnRequest(unsigned req_length){
+  std::cout << "OnRequest " << req_length << std::endl;
+
+}
+
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 //! 'OnExecute' will block on 'select' until it detects activity on one of the
 //! file descriptor sets (including FSockect). '::disconnect' write dummy data
@@ -41,9 +46,6 @@ struct timeval tv={0,0};
  for (; !FStopped; ){ // Searching for existing connections +++++++++++++++++++
   tv={FTimeOut,0}; // is modified in select (returns remaining time).
 
-  std::cout << "running3 " << std::endl;
-
-
   if (select(fdmax+1,&(rdset=refset),nullptr,nullptr,&tv)==-1) continue; // skip
   if (FD_ISSET(FSelfPipe[0], &rdset)) break; // see '::disconnet'
   // Run through existing connections looking for data to be read/new connections
@@ -57,12 +59,14 @@ struct timeval tv={0,0};
      FD_SET(newfd,&refset); // Add new descriptor to set.
      if (newfd>fdmax) fdmax=newfd; // keep track of maximum.
      start_connection(clientaddr,newfd); // accepted
-     std::cout << "New connection with " << std::endl;
     } else start_connection(clientaddr,-1); // rejected.
    } else { //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     modbus_set_socket(FContext, master_socket);
     rc=modbus_receive(FContext,FQuery);
-    if (rc>0) reply(static_cast<unsigned>(rc)); // Reply to request.
+    if (rc>0){ 
+      OnRequest(static_cast<unsigned>(rc));
+      reply(static_cast<unsigned>(rc));
+    } // Reply to request.
     else if (rc==-1){ // End connection and remove reference set ..............
      ::close(master_socket); FD_CLR(master_socket,&refset); // Remove from
      if (master_socket==fdmax) fdmax--; // keep track of maximum.
@@ -78,9 +82,8 @@ void cMODBUSServer::config(){
   if (modbus_set_slave(context(),0)==-1) throw CEXCP::Exception
     ("Fail to set slave ID",CEXCP::cTypeID(THIS,__FUNCTION__),"modbus_set_slave");
   //mb_mapping = modbus_mapping_new(5,0,0,0);
-  mb_mapping = modbus_mapping_new_start_address(0, 0, 0, 0, 340, 2, 0, 0);
 
-  mb_mapping = modbus_mapping_new_start_address(0, 0, 0, 0, 240, 2, 0, 0);
+  mb_mapping = modbus_mapping_new_start_address(0, 0, 0, 0, 0, 2, 0, 0);
   if (mb_mapping==NULL) throw CEXCP::Exception("Failed to allocate the mapping",
     CEXCP::cTypeID(THIS,__FUNCTION__),"modbus_mapping_new");
   //for (unsigned r=0; r<5; ++r) // set
@@ -93,6 +96,8 @@ void cMODBUSServer::config(){
 }
 void cMODBUSServer::reply(unsigned req_length){
  lock(); //####################################################################
+
+ std::cout << "reply: " << req_length << std::endl;
  modbus_reply(context(),query(),req_length,mb_mapping);
  unlock(); //##################################################################
 }

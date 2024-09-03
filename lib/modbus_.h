@@ -2,6 +2,8 @@
  * @file modbus_.h
 */
 
+#ifndef _MODBUS_
+#define _MODBUS_
 
 #include <exception_.h>
 #include <thread_.h>
@@ -11,6 +13,9 @@
 #include <modbus.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+
+//#include <server_wrapper.h>
+
 
 using namespace CMATH;
 
@@ -64,6 +69,7 @@ protected: //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     virtual void OnStart();
     virtual void OnExecute();
     virtual void OnStop(){ close(); }
+    virtual void OnRequest(unsigned req_length);
 public: //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     explicit cMODBUSServer(unsigned timeout_=10);
     virtual ~cMODBUSServer(){ close(); }
@@ -72,12 +78,14 @@ public: //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     void connect_TCP_PI(std::string node, std::string service, int nConnect=1);
     void connect_RTU(int ID, std::string dev, int b, char p, int dBits, int sBit);
     void disconnect();
+    //void setWServer(WServer *iwserver){ wserver = iwserver;};
     //.........................................................................
     inline cMODBUSBackend backend(){ return FBackEnd; }
     inline bool isEnabled(){ return FBackEnd!=mbUndefined; }
     inline unsigned timeout(){return FTimeOut; }
 
 
+    modbus_mapping_t* getMapping(){return mb_mapping;};
     std::string getLocalIP(std::string address);
 
 
@@ -115,3 +123,4 @@ public: //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 }
 
+#endif // _MODBUS_

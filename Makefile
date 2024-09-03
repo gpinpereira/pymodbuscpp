@@ -23,6 +23,7 @@ SRC_FILES = main.cpp \
 			lib/thread_.cpp \
 			lib/modbus_.cpp \
 			project/channel.cpp \
+			project/server_wrapper.cpp
 
 OBJ_FILES = $(SRC_FILES:.cpp=.o)
 TARGET = program
