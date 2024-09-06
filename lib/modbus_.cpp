@@ -96,8 +96,6 @@ void cMODBUSServer::config(){
 }
 void cMODBUSServer::reply(unsigned req_length){
  lock(); //####################################################################
-
- std::cout << "reply: " << req_length << std::endl;
  modbus_reply(context(),query(),req_length,mb_mapping);
  unlock(); //##################################################################
 }

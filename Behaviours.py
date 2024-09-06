@@ -24,8 +24,10 @@ class Bsetpoint(Behavior):
 
 
     def getValue(self):
-        self.value = random.randint(0,50)
-        return self.value
+        self.value = random.uniform(-1,1)
+        if self.value>0:
+            return True
+        return False
 
     def setValue(self, value):
         self.value = value+10

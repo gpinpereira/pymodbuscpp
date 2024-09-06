@@ -54,7 +54,7 @@ private: //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     CMATH::cBuffer<unsigned> FStatus, FTmp;
 protected: //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     inline const uint8_t* query(){ return FQuery; }
-    inline modbus_t* context(){ return FContext; }
+    
     inline int headerLength(){ return FHeaderLength; }
     inline int nConnections(){ return FnConnections; }
     inline bool stopped(){ return FStopped; }
@@ -87,7 +87,7 @@ public: //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     modbus_mapping_t* getMapping(){return mb_mapping;};
     std::string getLocalIP(std::string address);
-
+    inline modbus_t* context(){ return FContext; }
 
     enum cStatus { //......................................................
        stOK=0,                        // reg1: Running, No errors.
