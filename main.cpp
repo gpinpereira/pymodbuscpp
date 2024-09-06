@@ -6,7 +6,7 @@
 #include <pybind11/embed.h>  // python interpreter
 #include <pybind11/stl.h>  // type conversion
 
-namespace py = pybind11;
+//namespace py = pybind11;
 
 #include <iostream>
 //using namespace std;
@@ -23,7 +23,8 @@ int main(){
     py::scoped_interpreter guard{};
 
     WServer* server = new WServer(502);
-    server->addChannel(0);
+    server->addChannel(0, 2, HOLDINGREGISTER, FLOAT, LITTLE);
+    server->addChannel(0, 1, COIL, BOOL, LITTLE);
     server->start();
 
    

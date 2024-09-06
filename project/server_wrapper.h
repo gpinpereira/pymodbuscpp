@@ -1,7 +1,7 @@
 #ifndef WServer_H
 #define WServer_H
 
-#include <channel.h>
+#include "channel.h"
 #include <modbus_.h>
 #include <vector>  
 
@@ -15,7 +15,9 @@ class WServer: public CUTIL::cMODBUSServer {
 public:
     WServer(int iport); 
 
-    void addChannel(int index);
+	void addChannel(int index, int size, Endian endian);
+	void addChannel(int index, int size, Rtype register_type, Dtype data_type, Endian endian);
+	
 	void start();
 
 	void updateChannels();
