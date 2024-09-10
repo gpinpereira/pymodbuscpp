@@ -4,29 +4,13 @@
 
 
 Wrapper::Wrapper(){
-    readCSV();
-	processCSV();
-
-
-	for(int i=0; i<servers_o.size(); i++){
-		std::cout << "Server " << servers_o[i]->getID()  << std::endl;
-		std::cout << "N Channels " << servers_o[i]->getChannels().size()  << std::endl;
-
-		for(int j=0; j<servers_o[i]->getChannels().size(); j++){
-			std::cout << "Starting reg " << servers_o[i]->getChannels()[j]->getStartingRegister()  << std::endl;
-
-		}
-		/*if(servers[i]->getID() == serverID){
-			servers[i]->addChannel(channel);
-		}*/
-	}
-
-
+    //readCSV();
+	//processCSV();
 }
 
-void Wrapper::readCSV(){
+void Wrapper::readCSV(char *filenamepath){
 
-  std::string filename{"config.csv"};
+  std::string filename{filenamepath};
   std::ifstream input{filename};
 
   if (!input.is_open()) {
@@ -52,8 +36,6 @@ void Wrapper::readCSV(){
 }
 
 void Wrapper::processCSV(){
-
-
 	  // Print out our table
 
 	int server_id_idx = 0;
@@ -152,5 +134,32 @@ void Wrapper::processCSV(){
 
 void Wrapper::addServer(WServer *server){
 	servers_o.push_back(server);
+}
 
+void Wrapper::printStatus(){
+		for(int i=0; i<servers_o.size(); i++){
+		std::cout << "Server: " << servers_o[i]->getID()  << std::endl;
+		std::cout << "N Channels: " << servers_o[i]->getChannels().size()  << std::endl;
+		std::cout << "Max holding: " << servers_o[i]->getMaxRegister()  << std::endl;
+		std::cout << "Max coil: " << servers_o[i]->getMaxCoil()  << std::endl;
+		std::cout << "Max input: " << servers_o[i]->getMaxInput()  << std::endl;
+		std::cout << "Max discrete: " << servers_o[i]->getMaxDiscrete()  << std::endl;
+
+		for(int j=0; j<servers_o[i]->getChannels().size(); j++){
+			std::cout << "Starting reg " << servers_o[i]->getChannels()[j]->getStartingRegister()  << std::endl;
+
+		}
+	}
+
+}
+
+
+void Wrapper::start(){
+
+	for(int i=0; i<servers_o.size(); i++){
+		servers_o[i]->start();
+	}
+
+	servers_o[servers_o.size()-1]->wait();
+	
 }

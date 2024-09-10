@@ -41,11 +41,15 @@ void Channel::getBehaviourValue(){
             std::cout << "Python object doesn't have 'some_method'." << std::endl;
             return;
     }
+
+    std::cout << "Getting value" << std::endl;
+    std::cout << "Register value " << getStartingRegister() << std::endl;
         
     if(dtype == FLOAT || dtype == INTEGER) {
         uint32_t value32;
 
         if (dtype == INTEGER){
+            std::cout << "Getting integer" << std::endl;
             value32 = behaviour.attr("getValue")().cast<uint32_t>();
         }
         else if (dtype == FLOAT){

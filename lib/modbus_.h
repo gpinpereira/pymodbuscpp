@@ -52,6 +52,11 @@ private: //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     bool FStopped;
     modbus_mapping_t* mb_mapping;
     CMATH::cBuffer<unsigned> FStatus, FTmp;
+
+    int max_register = 0;
+    int max_coil = 0;
+    int max_input = 0;
+    int max_discrete = 0;
 protected: //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     inline const uint8_t* query(){ return FQuery; }
     
@@ -83,8 +88,16 @@ public: //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     inline cMODBUSBackend backend(){ return FBackEnd; }
     inline bool isEnabled(){ return FBackEnd!=mbUndefined; }
     inline unsigned timeout(){return FTimeOut; }
-
-
+    void setMaxRegister(int value) { max_register = value; }
+    void setMaxCoil(int value)     { max_coil = value; }
+    void setMaxInput(int value)    { max_input = value; }
+    void setMaxDiscrete(int value) { max_discrete = value; }
+    // Optional: single-line getters
+    int getMaxRegister() const { return max_register; }
+    int getMaxCoil() const     { return max_coil; }
+    int getMaxInput() const    { return max_input; }
+    int getMaxDiscrete() const { return max_discrete; }
+    
     modbus_mapping_t* getMapping(){return mb_mapping;};
     std::string getLocalIP(std::string address);
     inline modbus_t* context(){ return FContext; }

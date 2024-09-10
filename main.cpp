@@ -22,14 +22,10 @@ int main(){
 
 
     Wrapper* wrapper = new Wrapper();
-
-    /*WServer* server = new WServer(502);
-
-    server->readCSV();
-    //server->addChannel(0, 2, HOLDINGREGISTER, FLOAT, LITTLE);
-    //server->addChannel(0, 1, COIL, BOOL, LITTLE);
-    server->start();*/
-
+    wrapper->readCSV("config.csv");
+    wrapper->processCSV();
+    wrapper->printStatus();
+    wrapper->start();
    
     return 0;
 }

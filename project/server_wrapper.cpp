@@ -43,6 +43,25 @@ void WServer::addChannel(int index, int size, Rtype register_type, Dtype data_ty
 
 void WServer::addChannel(Channel *channel){
 
+    int last_reg = channel->getStartingRegister() + channel->getTotalRegister();
+    Rtype rtype = channel->getRegisterType();
+
+    if (rtype == HOLDINGREGISTER) {
+        if(last_reg>getMaxRegister())
+            setMaxRegister(last_reg);
+
+    } else if (rtype == INPUTREGISTER) {
+        if(last_reg>getMaxInput())
+            setMaxInput(last_reg);
+
+    } else if (rtype == COIL) {
+        if(last_reg>getMaxCoil())
+            setMaxCoil(last_reg);
+    } else if (rtype == DESCRETEINPUT) {
+        if(last_reg>getMaxDiscrete())
+            setMaxDiscrete(last_reg);
+    }
+
     channel->setServer(this);
     channels.push_back(channel);
 }
@@ -66,7 +85,7 @@ void WServer::start(){
     }
 
 
-    wait();
+    //wait();
 }
 
 

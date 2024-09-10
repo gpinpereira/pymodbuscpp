@@ -83,11 +83,11 @@ void cMODBUSServer::config(){
     ("Fail to set slave ID",CEXCP::cTypeID(THIS,__FUNCTION__),"modbus_set_slave");
   //mb_mapping = modbus_mapping_new(5,0,0,0);
 
-  mb_mapping = modbus_mapping_new_start_address(0, 1, 0, 0, 0, 2, 0, 0);
+  mb_mapping = modbus_mapping_new_start_address(0, max_coil, 0, max_discrete, 0, max_register, 0, max_input);
   if (mb_mapping==NULL) throw CEXCP::Exception("Failed to allocate the mapping",
     CEXCP::cTypeID(THIS,__FUNCTION__),"modbus_mapping_new");
   //for (unsigned r=0; r<5; ++r) // set
-    mb_mapping->tab_registers[0]=42;
+    //mb_mapping->tab_registers[0]=42;
     //mb_mapping->tab_registers[1]=22;
     //mb_mapping->tab_registers[r]=false;
 

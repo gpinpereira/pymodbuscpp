@@ -13,12 +13,13 @@ class Wrapper {
 
 public:
     Wrapper();
-	
-
+	void readCSV(char *filenamepath);
+	void processCSV();
+	void printStatus();
+	void start();
 private:
 	vector<vector<string>> csvRows;
-	void readCSV();
-	void processCSV();
+
 	void addServer(WServer *server);
 
 	std::vector<WServer*> servers_o;
