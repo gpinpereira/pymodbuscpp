@@ -29,7 +29,7 @@ void Channel::setBehaviour(char *behaviour_name){
 
     //py::scoped_interpreter guard{}; // start interpreter, dies when out of scope
     py::module Behaviours = py::module::import("Behaviours");
-    behaviour = Behaviours.attr("Bsetpoint")(2, 1);
+    behaviour = Behaviours.attr(behaviour_name)(2, 1);
 }
 
 
@@ -101,9 +101,15 @@ void Channel::setRegister(int reg, uint16_t value){
 
 void Channel::setBehaviourValue(std::vector<uint16_t> registers){
 
-
+    std::cout << "First register: " << reg_start << std::endl;
+    std::cout << "N register: " << reg_n << std::endl;
+    std::cout << "Datatype: " << dtype << std::endl;
+    std::cout << "Registertype: " << rtype << std::endl;
+    
+    //py::gil_scoped_acquire acquire;
+    py::gil_scoped_release release;
     py::gil_scoped_acquire acquire;
-
+    
     if (behaviour.attr("setValue").is_none()) {
             std::cout << "Python object doesn't have 'some_method'." << std::endl;
             return;
@@ -118,7 +124,7 @@ void Channel::setBehaviourValue(std::vector<uint16_t> registers){
             value = (static_cast<int32_t>(registers[1]) << 16) | registers[0];
         }
         std::cout << "Value: " << value << std::endl;
-        //behaviour.attr("setValue")(value);
+        behaviour.attr("setValue")(value);
     }
     else if (dtype == FLOAT){
         // Convert the float into its 32-bit binary representation
@@ -143,15 +149,17 @@ void Channel::setBehaviourValue(std::vector<uint16_t> registers){
 
         int16_t value = static_cast<int16_t>( registers[0]);
         std::cout << "Value: " << value << std::endl;
-        //behaviour.attr("setValue")(value);
+        behaviour.attr("setValue")(value);
 
     } else if (dtype == BOOL) {
             
         bool value = static_cast<bool>( registers[0]);
+        behaviour.attr("setValue")(value);
         std::cout << "Value: " << value << std::endl;
 
     } else{
             std::cout << "Unknown datatype" << std::endl;
     }
+    
 
 }

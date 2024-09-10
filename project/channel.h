@@ -31,7 +31,6 @@ enum Endian{
 };
 
 
-
 class Channel {
 
 public:
@@ -59,5 +58,66 @@ private:
     void setRegister(int reg, uint16_t value);
 
 };
+
+
+
+
+
+// Convert Dtype enum to string
+inline std::string DtypeToString(Dtype dtype) {
+    switch (dtype) {
+        case FLOAT: return "FLOAT";
+        case INTEGER: return "INTEGER";
+        case SHORT: return "SHORT";
+        case BOOL: return "BOOL";
+        default: return "Unknown Dtype";
+    }
+}
+
+// Convert Rtype enum to string
+inline std::string RtypeToString(Rtype rtype) {
+    switch (rtype) {
+        case HOLDINGREGISTER: return "HOLDING_REGISTER";
+        case INPUTREGISTER: return "INPUT_REGISTER";
+        case COIL: return "COIL";
+        case DESCRETEINPUT: return "DESCRETE_INPUT";
+        default: return "Unknown Rtype";
+    }
+}
+
+// Convert Endian enum to string
+inline  std::string EndianToString(Endian endian) {
+    switch (endian) {
+        case BIG: return "BIG";
+        case LITTLE: return "LITTLE";
+        default: return "Unknown Endian";
+    }
+}
+
+// Convert string to Dtype enum
+inline Dtype stringToDtype(const std::string& str) {
+    if (str == "FLOAT") return FLOAT;
+    else if (str == "INTEGER") return INTEGER;
+    else if (str == "SHORT") return SHORT;
+    else if (str == "BOOL") return BOOL;
+    throw std::invalid_argument("Invalid Dtype string: "+str);
+}
+
+// Convert string to Rtype enum
+inline Rtype stringToRtype(const std::string& str) {
+    if (str == "HOLDING_REGISTER") return HOLDINGREGISTER;
+    else if (str == "INPUT_REGISTER") return INPUTREGISTER;
+    else if (str == "COIL") return COIL;
+    else if (str == "DESCRETE_INPUT") return DESCRETEINPUT;
+    throw std::invalid_argument("Invalid Rtype string: "+str);
+}
+
+// Convert string to Endian enum
+inline Endian stringToEndian(const std::string& str) {
+    if (str == "BIG") return BIG;
+    else if (str == "LITTLE") return LITTLE;
+    throw std::invalid_argument("Invalid Endian string: "+str);
+}
+
 
 #endif 

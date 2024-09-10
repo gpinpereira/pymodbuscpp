@@ -18,8 +18,11 @@ WServer::WServer(int iport){
 
     CUTIL::cMODBUSServer();
     port = iport;
+}
 
-    max_register = 2;
+WServer::WServer(){
+
+    CUTIL::cMODBUSServer();
 }
 
 
@@ -27,8 +30,7 @@ void WServer::addChannel(int index, int size, Endian endian){
 
     Channel channel(index, size, HOLDINGREGISTER, FLOAT, endian);
     channel.setBehaviour("Bsetpoint");
-    channel.setServer(this);
-    channels.push_back(channel);
+    addChannel(&channel);
 }
 
 
@@ -36,9 +38,15 @@ void WServer::addChannel(int index, int size, Rtype register_type, Dtype data_ty
 
     Channel channel(index, size, register_type, data_type, endian);
     channel.setBehaviour("Bsetpoint");
-    channel.setServer(this);
+    addChannel(&channel);
+}
+
+void WServer::addChannel(Channel *channel){
+
+    channel->setServer(this);
     channels.push_back(channel);
 }
+
 
 
 void WServer::start(){
@@ -122,24 +130,19 @@ void WServer::start(){
 
             for(int i=0; i<channels.size(); i++){
 
-                if(channels[i].getStartingRegister() == reg_address &&
-                    channels[i].getRegisterType() == rtype)
-                channels[i].setBehaviourValue(reg_values);
+                if(channels[i]->getStartingRegister() == reg_address &&
+                    channels[i]->getRegisterType() == rtype)
+                    channels[i]->setBehaviourValue(reg_values);
             }
         }
-
-
-        std::cout << "starting register: " << reg_address << " type: " << rtype << std::endl;
-        std::cout << "size: " << reg_values.size() << std::endl;
-
-
 }
 
 
 void WServer::updateChannels(){
 
     for(int i=0; i<channels.size(); i++){
-        channels[i].getBehaviourValue();
+        channels[i]->getBehaviourValue();
     }
 
 }
+

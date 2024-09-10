@@ -1,15 +1,13 @@
 //#include "modbus_.h"
-#include <server_wrapper.h>
+//#include <server_wrapper.h>
 
+
+#include <wrapper.h>
 
 #include <pybind11/pybind11.h>
 #include <pybind11/embed.h>  // python interpreter
 #include <pybind11/stl.h>  // type conversion
-
-//namespace py = pybind11;
-
 #include <iostream>
-//using namespace std;
 using namespace CUTIL;
 
 
@@ -22,10 +20,15 @@ int main(){
     //float value = behaviour.attr("getValue")().cast<float>();
     py::scoped_interpreter guard{};
 
-    WServer* server = new WServer(502);
-    server->addChannel(0, 2, HOLDINGREGISTER, FLOAT, LITTLE);
-    server->addChannel(0, 1, COIL, BOOL, LITTLE);
-    server->start();
+
+    Wrapper* wrapper = new Wrapper();
+
+    /*WServer* server = new WServer(502);
+
+    server->readCSV();
+    //server->addChannel(0, 2, HOLDINGREGISTER, FLOAT, LITTLE);
+    //server->addChannel(0, 1, COIL, BOOL, LITTLE);
+    server->start();*/
 
    
     return 0;
