@@ -1,5 +1,5 @@
-serverID,Name,Description,Port,,,,,,,
-1 ,wrapper,,502,,,,,,,
+serverID,Name,Description,Port
+1 ,wrapper,,502
 ,,,,,,,,,,
 channelID,serverID,Name,Description,Reverse word order,Channel Datatype,MB starting add,MB lenght,MB type,Behavior,Command
 1,1,Ch 1.1.0,,LITTLE,BOOL,0,1,COIL,Bsetpoint,0,1
