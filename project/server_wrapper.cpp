@@ -54,7 +54,7 @@ void WServer::start(){
 
     std::string address= getLocalIP("127.0.0.1");
 
-    std::cout << "port: " << port << std::endl;
+    std::cout << "Started serving server "<< getID() <<" on port: " << port << std::endl;
     connect_TCP(address, port, 2);
     execute();
 

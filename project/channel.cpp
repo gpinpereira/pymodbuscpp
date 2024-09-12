@@ -35,7 +35,7 @@ void Channel::setBehaviour(char *behaviour_name, std::vector<string> params){
 
     py::object Behaviours = py::module_::import("Behaviours");
     behaviour = Behaviours.attr(behaviour_name)(params);
-    behaviour.attr("setChannelObj")(this);
+    behaviour.attr("_setChannelObj")(this);
 
 }
 

@@ -59,7 +59,8 @@ void Wrapper::processCSV(){
 
   	for (const std::vector<std::string>& row : csvRows) {
 
-		if (cReplace(row[server_id_idx], " ", "").size() == 0){
+		//skip row if first value in row is empty
+		if (cReplace(row[0], " ", "").size() == 0){
 			continue;
 		}
 
@@ -68,7 +69,7 @@ void Wrapper::processCSV(){
 			int serverID = std::stoi(cReplace(row[server_id_idx], " ", ""));
 			std::string serverName = cReplace(row[server_name_idx], " ", "");
 			int serverPort = std::stoi(cReplace(row[server_port_idx], " ", ""));
-			std::cout << "Adding server: " << serverID << " " << serverName << " " << serverPort << "\n";
+			//std::cout << "Adding server: " << serverID << " " << serverName << " " << serverPort << "\n";
 
 			WServer* server = new WServer();
 
@@ -100,7 +101,7 @@ void Wrapper::processCSV(){
 			std::vector<std::string> params_out = std::vector<std::string>(row.begin() + channel_param_idx, row.end());
 
 			// Output the parameters in a single sentence
-    		std::cout << "Adding Modbus Channel: Server ID = " << serverID
+    		std::cout << "\tServer ID = " << serverID
 					<< ", Name: " << name
 					<< ", Starting Register = " << starting_reg
 					<< ", Number of Registers = " << n_reg
@@ -129,6 +130,7 @@ void Wrapper::processCSV(){
 		if((row[0] == "channelID") && !isAddingChannels){
 			isAddingChannels = true;
 			isAddingServers = false;
+			std::cout << "Added channels: " << std::endl;
 		}
 
         
@@ -143,13 +145,16 @@ void Wrapper::addServer(WServer *server){
 }
 
 void Wrapper::printStatus(){
+	std::cout << "Servers: "<< std::endl;
+
 		for(int i=0; i<servers_o.size(); i++){
-		std::cout << "Server: " << servers_o[i]->getID()  << std::endl;
-		std::cout << "N Channels: " << servers_o[i]->getChannels().size()  << std::endl;
-		std::cout << "Max holding: " << servers_o[i]->getMaxRegister()  << std::endl;
-		std::cout << "Max coil: " << servers_o[i]->getMaxCoil()  << std::endl;
-		std::cout << "Max input: " << servers_o[i]->getMaxInput()  << std::endl;
-		std::cout << "Max discrete: " << servers_o[i]->getMaxDiscrete()  << std::endl;
+		std::cout << "\tId: " << servers_o[i]->getID()
+				  << ", Port: " << servers_o[i]->getPort()
+		          << ", N Channels: " << servers_o[i]->getChannels().size()
+		          << ", Max holding: " << servers_o[i]->getMaxRegister()
+		          << ", Max coil: " << servers_o[i]->getMaxCoil()
+		          << ", Max input: " << servers_o[i]->getMaxInput()
+		          << ", Max discrete: " << servers_o[i]->getMaxDiscrete() << std::endl;
 
 	}
 

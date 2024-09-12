@@ -40,8 +40,6 @@ struct timeval tv={0,0};
  selfPipeTrick(fdmax,refset); // add a self-pipe to safely '::disconnet'
 
 
- std::cout << "running " << std::endl;
-
  //............................................................................
  for (; !FStopped; ){ // Searching for existing connections +++++++++++++++++++
   tv={FTimeOut,0}; // is modified in select (returns remaining time).
@@ -91,9 +89,8 @@ void cMODBUSServer::config(){
     //mb_mapping->tab_registers[1]=22;
     //mb_mapping->tab_registers[r]=false;
 
-
-  std::cout << "FStatus: " << FStatus.size() << std::endl;
 }
+
 void cMODBUSServer::reply(unsigned req_length){
  lock(); //####################################################################
  modbus_reply(context(),query(),req_length,mb_mapping);

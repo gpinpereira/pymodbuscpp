@@ -27,7 +27,7 @@ SRC_FILES = main.cpp \
 			project/wrapper.cpp 
 
 OBJ_FILES = $(SRC_FILES:.cpp=.o)
-TARGET = program
+TARGET = wrapper
 
 # Libraries
 LIBS = -lpthread -lmodbus -lpython3.8
