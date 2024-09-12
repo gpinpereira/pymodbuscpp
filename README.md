@@ -1,5 +1,7 @@
 # ModbusWrapperCpp
 
+The project is **ready to use**, but it is **under development**. Feedback and contributions are welcome as I continue to improve the project.
+
 # Modbus Server Wrapper in C++
 
 This repository provides a C++ wrapper for generating Modbus servers, designed to simplify the configuration and management of Modbus channels from a CSV file. It uses **pybind11** to integrate custom Python scripts for handling the `get` and `set` operations of channels, facilitating easy server implementation and customization in Python.
@@ -86,8 +88,3 @@ and run:
 sudo ./wrapper
 ```
 
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-The project is **ready to use**, but it is **under development**. Feedback and contributions are welcome as I continue to improve the project.
