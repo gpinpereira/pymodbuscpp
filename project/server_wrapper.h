@@ -22,10 +22,9 @@ public:
 	int getID(){ return id; };
     int getPort(){ return port; };
     std::string getName(){ return name; };
-
-	void addChannel(int index, int size, Endian endian);
-	void addChannel(int index, int size, Rtype register_type, Dtype data_type, Endian endian);
 	void addChannel(Channel *channel);
+	Channel* getChannel(std::string name);
+
 	void start();
 
 	void updateChannels();

@@ -1,6 +1,6 @@
 #include "wrapper.h"
 #include "channel.h"
-
+#include <numeric> // For std::accumulate
 
 
 Wrapper::Wrapper(){
@@ -43,12 +43,14 @@ void Wrapper::processCSV(){
 	int server_port_idx = 3;
 
 	int channel_server_idx = 1;
+	int channel_name_idx = 2;
 	int channel_start_reg_idx = 6;
 	int channel_n_reg_idx = 7;
 	int channel_regtype_idx = 8;
 	int channel_dtype_idx = 5;
 	int channel_endian_idx = 4;
 	int channel_behaviour_idx = 9;
+	int channel_param_idx = 10;
 
 	bool isAddingServers = false;
 	bool isAddingChannels = false;
@@ -56,8 +58,6 @@ void Wrapper::processCSV(){
 	
 
   	for (const std::vector<std::string>& row : csvRows) {
-
-		std::cout << servers_o.size() << " " << isAddingServers << " " << isAddingChannels << " " << row[0] << "\n";
 
 		if (cReplace(row[server_id_idx], " ", "").size() == 0){
 			continue;
@@ -83,6 +83,9 @@ void Wrapper::processCSV(){
 		if(isAddingChannels){
 
 			int serverID = std::stoi(cReplace(row[channel_server_idx], " ", ""));
+			string name = row[channel_name_idx];
+
+			
 			int starting_reg = std::stoi(cReplace(row[channel_start_reg_idx], " ", ""));
 			int n_reg = std::stoi(cReplace(row[channel_n_reg_idx], " ", ""));
 
@@ -91,12 +94,14 @@ void Wrapper::processCSV(){
 			Endian endian = stringToEndian(cReplace(row[channel_endian_idx], " ", ""));
 
 			string behaviour = cReplace(row[channel_behaviour_idx], " ", "");
-
 			char* cbehaviour  = new char[behaviour.size() + 1];
 			std::strcpy(cbehaviour, behaviour.c_str());
 
+			std::vector<std::string> params_out = std::vector<std::string>(row.begin() + channel_param_idx, row.end());
+
 			// Output the parameters in a single sentence
     		std::cout << "Adding Modbus Channel: Server ID = " << serverID
+					<< ", Name: " << name
 					<< ", Starting Register = " << starting_reg
 					<< ", Number of Registers = " << n_reg
 					<< ", Register Type = " << RtypeToString(regtype)
@@ -105,9 +110,10 @@ void Wrapper::processCSV(){
 					<< ", Behaviour = " << cbehaviour << std::endl;
 
 			Channel* channel = new Channel(starting_reg, n_reg, regtype, datatype, endian);
-			channel->setBehaviour(cbehaviour);
-
-
+			
+			channel->setBehaviour(cbehaviour, params_out);
+			channel->setName(name);
+			
 			for(int i=0; i<servers_o.size(); i++){
 				if(servers_o[i]->getID() == serverID){
 					servers_o[i]->addChannel(channel);
@@ -145,10 +151,6 @@ void Wrapper::printStatus(){
 		std::cout << "Max input: " << servers_o[i]->getMaxInput()  << std::endl;
 		std::cout << "Max discrete: " << servers_o[i]->getMaxDiscrete()  << std::endl;
 
-		for(int j=0; j<servers_o[i]->getChannels().size(); j++){
-			std::cout << "Starting reg " << servers_o[i]->getChannels()[j]->getStartingRegister()  << std::endl;
-
-		}
 	}
 
 }

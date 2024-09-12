@@ -11,6 +11,7 @@
 using namespace CUTIL;
 
 
+
 int main(){
 
     //py::scoped_interpreter guard{}; // start interpreter, dies when out of scope
@@ -19,7 +20,6 @@ int main(){
 
     //float value = behaviour.attr("getValue")().cast<float>();
     py::scoped_interpreter guard{};
-
 
     Wrapper* wrapper = new Wrapper();
     wrapper->readCSV("config.csv");

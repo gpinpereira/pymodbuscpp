@@ -24,7 +24,7 @@ SRC_FILES = main.cpp \
 			lib/modbus_.cpp \
 			project/channel.cpp \
 			project/server_wrapper.cpp \
-			project/wrapper.cpp
+			project/wrapper.cpp 
 
 OBJ_FILES = $(SRC_FILES:.cpp=.o)
 TARGET = program
@@ -42,7 +42,7 @@ $(TARGET): $(OBJ_FILES)
 
 # Compile each source file into an object file
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(PYINCLUDES) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(PYINCLUDES) -c $< -o $@ 
 
 # Clean up generated files
 clean:

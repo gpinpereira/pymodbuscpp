@@ -2,6 +2,7 @@
 #define Channel_H
 
 #include <pybind11/pybind11.h>
+#include <pybind11/embed.h>  // Everything needed for embedding
 #include <modbus_.h>
 #include <vector>
 
@@ -40,16 +41,24 @@ public:
 
     int getStartingRegister(){return reg_start;};
     int getTotalRegister(){return reg_n;};
+    std::string getName(){return name;};
+    void setName(std::string name);
     Rtype getRegisterType(){return rtype;};
+    py::object getBehaviour(){return behaviour;};
 
-    void getBehaviourValue();
-    void setBehaviour(char *behaviour_name);
+    void updateValue();
+    void setBehaviour(char *behaviour_name, std::vector<std::string> params);
     void setServer(WServer* server);
     void setBehaviourValue(std::vector<uint16_t> registers);
+
+    Channel* findChannelbyName(std::string name);
+
+
 private:
     py::object behaviour;
     int reg_start;
     int reg_n;
+    std::string name;
     Dtype dtype;
     Rtype rtype;
     Endian endiantype;
@@ -58,6 +67,15 @@ private:
     void setRegister(int reg, uint16_t value);
 
 };
+
+
+
+
+
+
+
+
+
 
 
 
@@ -118,6 +136,7 @@ inline Endian stringToEndian(const std::string& str) {
     else if (str == "LITTLE") return LITTLE;
     throw std::invalid_argument("Invalid Endian string: "+str);
 }
+
 
 
 #endif 

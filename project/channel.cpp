@@ -10,6 +10,8 @@ namespace py = pybind11;
 using namespace CUTIL;
 
 
+
+
 Channel::Channel(int first_register, int n_registers,  Rtype register_type, Dtype data_type, Endian endian){
 
     reg_start = first_register;
@@ -24,39 +26,58 @@ void Channel::setServer(WServer *server){
     mb_server = server;
 }
 
-
-void Channel::setBehaviour(char *behaviour_name){
-
-    //py::scoped_interpreter guard{}; // start interpreter, dies when out of scope
-    py::module Behaviours = py::module::import("Behaviours");
-    behaviour = Behaviours.attr(behaviour_name)(2, 1);
+void Channel::setName(std::string name){
+    this->name = name;
 }
 
 
-void Channel::getBehaviourValue(){
+void Channel::setBehaviour(char *behaviour_name, std::vector<string> params){
+
+    py::object Behaviours = py::module_::import("Behaviours");
+    behaviour = Behaviours.attr(behaviour_name)(params);
+    behaviour.attr("setChannelObj")(this);
+
+}
+
+
+
+void Channel::updateValue(){
 
     py::gil_scoped_acquire acquire;
 
     if (behaviour.attr("getValue").is_none()) {
-            std::cout << "Python object doesn't have 'some_method'." << std::endl;
+            std::cout << "Python object doesn't have 'getValue' method." << std::endl;
             return;
     }
 
-    std::cout << "Getting value" << std::endl;
-    std::cout << "Register value " << getStartingRegister() << std::endl;
+    if (behaviour.attr("updateValue").is_none()) {
+            std::cout << "Python object doesn't have 'updateValue' method." << std::endl;
+            return;
+    }
+
+
+    behaviour.attr("updateValue")();
         
     if(dtype == FLOAT || dtype == INTEGER) {
         uint32_t value32;
 
         if (dtype == INTEGER){
-            std::cout << "Getting integer" << std::endl;
-            value32 = behaviour.attr("getValue")().cast<uint32_t>();
+            //std::cout << "Getting integer" << std::endl;
+            //int valueI = (int) behaviour.attr("getValue")().cast<float>();
+            float valuef = behaviour.attr("getValue")().cast<float>();
+            value32 = (int) valuef;
+
+            //std::cout << "Converting " << valuef << " " << valuef << std::endl;
+            //value32 = *reinterpret_cast<uint32_t*>(&valueI);
         }
         else if (dtype == FLOAT){
             // Convert the float into its 32-bit binary representation
             float valuef = behaviour.attr("getValue")().cast<float>();
             value32 = *reinterpret_cast<uint32_t*>(&valuef);
+
+            //std::cout << "the value: " << valuef << std::endl;
         }
+
 
         uint16_t registers[2];
         registers[0] = (value32 >> 16) & 0xFFFF;  // High 16 bits
@@ -89,7 +110,6 @@ void Channel::getBehaviourValue(){
 
 void Channel::setRegister(int reg, uint16_t value){
 
-
     if(rtype == HOLDINGREGISTER) {
         mb_server->getMapping()->tab_registers[reg] = value;
     } else if(rtype == COIL) {
@@ -98,6 +118,8 @@ void Channel::setRegister(int reg, uint16_t value){
         mb_server->getMapping()->tab_input_registers[reg] = value;
     } else if(rtype == DESCRETEINPUT) {
         mb_server->getMapping()->tab_input_bits[reg] = value;
+    }else{
+        std::cout << "Unknown register type" << std::endl;
     }
 }
 
@@ -141,12 +163,7 @@ void Channel::setBehaviourValue(std::vector<uint16_t> registers){
         }
 
         float value = *reinterpret_cast<float*>(&value32);
-
         std::cout << "Value: " << value << std::endl;
-
-        float valuef = behaviour.attr("getValue")().cast<float>();
-
-        std::cout << "Value: " << value  << " : " << valuef << std::endl;
         behaviour.attr("setValue")(value);
 
     } else if (dtype == SHORT) {
@@ -167,3 +184,51 @@ void Channel::setBehaviourValue(std::vector<uint16_t> registers){
     
 
 }
+
+
+Channel* Channel::findChannelbyName(std::string name){
+    return mb_server->getChannel(name);
+}
+
+
+
+PYBIND11_EMBEDDED_MODULE(cppobjects, m){
+
+        // Expose enums
+    py::enum_<Dtype>(m, "Dtype")
+        .value("FLOAT", Dtype::FLOAT)
+        .value("INTEGER", Dtype::INTEGER)
+        .value("SHORT", Dtype::SHORT)
+        .value("BOOL", Dtype::BOOL)
+        .export_values();
+
+    py::enum_<Rtype>(m, "Rtype")
+        .value("HOLDINGREGISTER", Rtype::HOLDINGREGISTER)
+        .value("INPUTREGISTER", Rtype::INPUTREGISTER)
+        .value("COIL", Rtype::COIL)
+        .value("DESCRETEINPUT", Rtype::DESCRETEINPUT)
+        .export_values();
+
+    py::enum_<Endian>(m, "Endian")
+        .value("BIG", Endian::BIG)
+        .value("LITTLE", Endian::LITTLE)
+        .export_values();
+
+    // Expose the Channel class
+    py::class_<Channel>(m, "Channel")
+        .def(py::init<int, int, Rtype, Dtype, Endian>(),  // Constructor with enums and int
+            py::arg("first_register"),
+            py::arg("n_registers"),
+            py::arg("register_type"),
+            py::arg("data_type"),
+            py::arg("endian"))
+        .def("getStartingRegister", &Channel::getStartingRegister)
+        .def("getTotalRegister", &Channel::getTotalRegister)
+        .def("getRegisterType", &Channel::getRegisterType)
+        .def("findChannelbyName", &Channel::findChannelbyName, py::return_value_policy::reference)
+        .def("getBehaviour", &Channel::getBehaviour);
+
+}
+
+
+

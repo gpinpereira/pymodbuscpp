@@ -4,7 +4,7 @@
 #include <channel.h>
 
 #include <pybind11/pybind11.h>
-#include <pybind11/embed.h>  // python interpreter
+//#include <pybind11/embed.h>  // python interpreter
 #include <pybind11/stl.h>  // type conversion
 #include "server_wrapper.h"
 
@@ -23,22 +23,6 @@ WServer::WServer(int iport){
 WServer::WServer(){
 
     CUTIL::cMODBUSServer();
-}
-
-
-void WServer::addChannel(int index, int size, Endian endian){
-
-    Channel channel(index, size, HOLDINGREGISTER, FLOAT, endian);
-    channel.setBehaviour("Bsetpoint");
-    addChannel(&channel);
-}
-
-
-void WServer::addChannel(int index, int size, Rtype register_type, Dtype data_type, Endian endian){
-
-    Channel channel(index, size, register_type, data_type, endian);
-    channel.setBehaviour("Bsetpoint");
-    addChannel(&channel);
 }
 
 void WServer::addChannel(Channel *channel){
@@ -66,10 +50,7 @@ void WServer::addChannel(Channel *channel){
     channels.push_back(channel);
 }
 
-
-
 void WServer::start(){
-
 
     std::string address= getLocalIP("127.0.0.1");
 
@@ -78,14 +59,9 @@ void WServer::start(){
     execute();
 
     while (true) {
-        // Your code here (this block will run every second)
         updateChannels();
-        // Pause execution for 1 second
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-
-
-    //wait();
 }
 
 
@@ -95,8 +71,6 @@ void WServer::start(){
         uint16_t reg_address;
         std::vector<uint16_t> reg_values;
         Rtype rtype;
-
-        bool write = false;
 
         if(function_code == MODBUS_FC_WRITE_SINGLE_COIL){
 
@@ -118,7 +92,7 @@ void WServer::start(){
             rtype = COIL;
             reg_address = (query()[8] << 8) | query()[9];
             uint16_t num_coils = (query()[10] << 8) | query()[11];
-            uint8_t byte_count = query()[12];
+            //uint8_t byte_count = query()[12];
 
             for (int i = 0; i < num_coils; i++) {
                 int byte_index = 13 + (i / 8);  // Start of data + byte offset
@@ -160,8 +134,19 @@ void WServer::start(){
 void WServer::updateChannels(){
 
     for(int i=0; i<channels.size(); i++){
-        channels[i]->getBehaviourValue();
+        channels[i]->updateValue();
     }
+}
 
+
+Channel* WServer::getChannel(std::string name){
+
+    for(int i=0; i<channels.size(); i++){
+        if(channels[i]->getName() == name){
+            return channels[i];
+        }
+    }
+    
+    return nullptr;
 }
 
